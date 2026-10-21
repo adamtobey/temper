@@ -158,6 +158,13 @@ not an application-specific workflow in the kernel. Broader app contracts, schem
 migrations, CSDL generation, and additional app-testing methods remain separate
 extensions. Existing platform tests and DST remain required.
 
+For a nontrivial Lean-only app using this existing path, see the
+[RAW compaction port and experiment](../RAW_LEAN_PORT.md). Its complete format and
+row-preservation contract, fixed synthetic benchmark, proved optimization
+candidates, and independent byte-level tests live under
+`test-fixtures/lean/raw-compaction/`. Run its `experiment.py prepare` command to
+materialize a package with a reproducible benchmark manifest before verification.
+
 ## Verification
 
 ```sh

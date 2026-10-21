@@ -1,0 +1,11 @@
+{
+  "seed": 182,
+  "rows": 2048,
+  "input_files": 8,
+  "output_files": 4,
+  "metric": "latency_ns",
+  "direction": "minimize",
+  "samples": 9,
+  "iterations": 10,
+  "minimum_improvement": 0.03
+}

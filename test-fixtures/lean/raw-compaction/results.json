@@ -1,0 +1,121 @@
+{
+  "date_utc": "2026-10-21",
+  "host": "Apple M4 Max, arm64 macOS",
+  "kernel_revision": "3a38d2f1",
+  "equivalent_checkout_kernel_revision": "3b1839d2",
+  "lean_version": "4.30.0-rc2",
+  "lean_commit": "3dc1a088b6d2d8eafe25a7cd7ec7b58d731bd7cc",
+  "temper_lean_binary_sha256": "91b7db3ee8a4cfeffaa974787440a8c0f9ddffd828aed09d946d63e6e97ed58f",
+  "native_file_sha256": "d76469a50a055265d3d06bde7ee62d8152e795f82faf49c5db3287154a72dc39",
+  "workload": {
+    "seed": 182,
+    "rows": 2048,
+    "input_files": 8,
+    "output_files": 4,
+    "input_raw_bytes": 86016,
+    "request_utf8_bytes": 172041,
+    "workload_sha256": "5acb4a64e288dd896281b3bd8d07328d9a666c9cd800048da0e33bffc44a1a2f",
+    "spec_sha256": "21477442c0162f5b1c82c5e2d601997ef2e03f71e9e73ce95f2a2927ed216a23",
+    "manifest_sha256": "1de3e02b0bb9113036d2dcc480b9779f67db506db2724318fe4113209ae2631b",
+    "python": "3.9.6"
+  },
+  "reproduction_search": {
+    "candidate": "55559266cd739968326a8983f574a12c57edad9d6365a285adc4d8a0e1acb19f",
+    "deployment_review_required": true,
+    "history": [
+      {
+        "accepted": true,
+        "candidate": "6bc2e3db3455840550da5486eb48d0ba8e23e4f571a96eba12c51c16dbd15fbd",
+        "diagnostic": null,
+        "measurement": 228222400,
+        "parent": null
+      },
+      {
+        "accepted": false,
+        "candidate": null,
+        "diagnostic": "Lean subprocess failed (exit status: 1): Candidate.lean:9:46: error: Type mismatch\n  Contract.run_correct Contract.referenceDictionary\nhas type\n  Contract.correct (Contract.run Contract.referenceDictionary)\nbut is expected to have type\n  Contract.correct program\n\n",
+        "measurement": null,
+        "parent": "6bc2e3db3455840550da5486eb48d0ba8e23e4f571a96eba12c51c16dbd15fbd"
+      },
+      {
+        "accepted": true,
+        "candidate": "f1d25aeec396fef1492158cac6533c3e86d8ffaba9b8d1550a4bd9b571218971",
+        "diagnostic": null,
+        "measurement": 203440500,
+        "parent": "6bc2e3db3455840550da5486eb48d0ba8e23e4f571a96eba12c51c16dbd15fbd"
+      },
+      {
+        "accepted": true,
+        "candidate": "55559266cd739968326a8983f574a12c57edad9d6365a285adc4d8a0e1acb19f",
+        "diagnostic": null,
+        "measurement": 161300200,
+        "parent": "f1d25aeec396fef1492158cac6533c3e86d8ffaba9b8d1550a4bd9b571218971"
+      },
+      {
+        "accepted": false,
+        "candidate": "6bc2e3db3455840550da5486eb48d0ba8e23e4f571a96eba12c51c16dbd15fbd",
+        "diagnostic": null,
+        "measurement": 229017900,
+        "parent": "55559266cd739968326a8983f574a12c57edad9d6365a285adc4d8a0e1acb19f"
+      }
+    ],
+    "specification": "0029c6d4760348a343f574fd27b4fca90bb4f4f9fa2d9873f694102d257cbe09"
+  },
+  "earlier_final_search": [
+    {
+      "parent": null,
+      "candidate": "6bc2e3db3455840550da5486eb48d0ba8e23e4f571a96eba12c51c16dbd15fbd",
+      "measurement": 251855700,
+      "accepted": true,
+      "diagnostic": null
+    },
+    {
+      "parent": "6bc2e3db3455840550da5486eb48d0ba8e23e4f571a96eba12c51c16dbd15fbd",
+      "candidate": null,
+      "measurement": null,
+      "accepted": false,
+      "diagnostic": "Lean subprocess failed (exit status: 1): Candidate.lean:9:46: error: Type mismatch\n  Contract.run_correct Contract.referenceDictionary\nhas type\n  Contract.correct (Contract.run Contract.referenceDictionary)\nbut is expected to have type\n  Contract.correct program\n\n"
+    },
+    {
+      "parent": "6bc2e3db3455840550da5486eb48d0ba8e23e4f571a96eba12c51c16dbd15fbd",
+      "candidate": "f1d25aeec396fef1492158cac6533c3e86d8ffaba9b8d1550a4bd9b571218971",
+      "measurement": 201525500,
+      "accepted": true,
+      "diagnostic": null
+    },
+    {
+      "parent": "f1d25aeec396fef1492158cac6533c3e86d8ffaba9b8d1550a4bd9b571218971",
+      "candidate": "55559266cd739968326a8983f574a12c57edad9d6365a285adc4d8a0e1acb19f",
+      "measurement": 163968600,
+      "accepted": true,
+      "diagnostic": null
+    },
+    {
+      "parent": "55559266cd739968326a8983f574a12c57edad9d6365a285adc4d8a0e1acb19f",
+      "candidate": "6bc2e3db3455840550da5486eb48d0ba8e23e4f571a96eba12c51c16dbd15fbd",
+      "measurement": 231164700,
+      "accepted": false,
+      "diagnostic": null
+    }
+  ],
+  "validation": {
+    "candidate": "55559266cd739968326a8983f574a12c57edad9d6365a285adc4d8a0e1acb19f",
+    "artifact_hash": "8703d68e5e5a8e915bf55488897ff34a7f7f9448042abcc5d9d7f11eb9d613b2",
+    "specification": "0029c6d4760348a343f574fd27b4fca90bb4f4f9fa2d9873f694102d257cbe09",
+    "seeded_cases": 64,
+    "seeded_replays": 64,
+    "invalid_cases": 16,
+    "checked_rows": 11325,
+    "negative_controls": 3,
+    "original_example_rows": 6,
+    "reviewer": null,
+    "test_only": true
+  },
+  "metric_notes": "Median monotonic elapsed ns per complete compaction; one request per workload. Local shared host, not CPU-time accounting. Native initialization, proof checking, compilation and process startup excluded.",
+  "deployment_gate": {
+    "reviewer": null,
+    "unreviewed_invoke_refused": true,
+    "diagnostic": "Error: deployment review is required",
+    "deployed": false
+  }
+}
