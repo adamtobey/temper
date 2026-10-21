@@ -50,6 +50,11 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Check Lean specifications, optimize native cores, and review deployment.
+    Lean {
+        #[command(subcommand)]
+        command: temper_lean::cli::LeanCommand,
+    },
     /// Initialize a new Temper project
     Init { name: String },
     /// Generate Rust code from specifications
@@ -184,6 +189,10 @@ enum Commands {
         /// per entity. Exit 0 = pass; non-zero or timeout = failure.
         #[arg(long)]
         verify_subprocess: bool,
+        /// Reviewed Lean artifact directories to load at startup. Repeatable.
+        /// Each directory binds its tenant, component, proofs, and exact binary.
+        #[arg(long)]
+        lean_artifact: Vec<PathBuf>,
         /// Discord bot token for channel transport (enables Discord Gateway).
         /// Falls back to DISCORD_BOT_TOKEN env var if not provided.
         #[arg(long)]
@@ -306,6 +315,7 @@ fn main() -> anyhow::Result<()> {
 
 async fn async_main(cli: Cli) -> anyhow::Result<()> {
     match cli.command {
+        Commands::Lean { command } => temper_lean::cli::run(command)?,
         Commands::Init { name } => init::run(&name)?,
         Commands::Install {
             app_ref,
@@ -358,6 +368,7 @@ async fn async_main(cli: Cli) -> anyhow::Result<()> {
             specs_dir,
             tenant,
             verify_subprocess,
+            lean_artifact,
             discord_bot_token,
         } => {
             let bind = serve::options::resolve_bind_addr(
@@ -425,6 +436,7 @@ async fn async_main(cli: Cli) -> anyhow::Result<()> {
                 actor_backed_type,
                 !no_observe,
                 verify_subprocess,
+                lean_artifact,
                 discord_token,
                 tenant,
             )

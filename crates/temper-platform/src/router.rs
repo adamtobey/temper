@@ -49,6 +49,7 @@ pub fn build_platform_router(state: PlatformState) -> Router {
 
     temper_server::build_router(state.server.clone())
         .merge(health)
+        .merge(crate::lean::router().with_state(state.clone()))
         .merge(identity_api.with_state(state.server.clone()))
         .merge(platform_observe.with_state(state.clone()))
         .nest("/api", tenant_api.with_state(state.clone()))

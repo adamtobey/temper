@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "tenant": "default",
+  "component": "echo",
+  "toolchain": "leanprover/lean4:v4.30.0-rc2",
+  "specification_proofs": ["consistent"],
+  "obligations": ["preserves"],
+  "objective": {
+    "metric": "latency_ns",
+    "direction": "minimize",
+    "inputs": ["hello", "{\"state\":\"ready\",\"action\":\"read\"}"],
+    "samples": 5,
+    "iterations": 1000,
+    "minimum_improvement": 0.05
+  }
+}

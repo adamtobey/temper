@@ -1,6 +1,6 @@
 # ADR-0182: Lean verified apps and proof-preserving optimization
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-10-21
 - Deciders: Temper core maintainers
 - Related:
@@ -338,30 +338,26 @@ inherit a spec-mutation workflow that can change that contract. Existing
 `temper-evolution` facilities should be assessed for reusable kernel mechanisms;
 their presence is not a reason to add app-specific agent logic to this repository.
 
-## Open Design Questions
+## Initial Implementation
 
-The direction and spec-first workflow are resolved above. Remaining design work is:
+`temper-lean` implements the immutable package, real Lean proof checker, native
+String-to-String ABI, benchmark selection, external-proposer protocol, and exact
+artifact review. `temper lean` exposes these operations. Reviewed cores load via
+`serve --lean-artifact` and use the existing authenticated Rust service layer.
+The complete, small echo fixture demonstrates the end-to-end path. See
+[Lean app cores](../lean.md) for package/ABI details, commands, and verification.
 
-1. **What is the first component?** Select a concrete app core, its complete
-   component contract, its Rust service boundary, and a benchmarked objective.
-   Future scope can grow without relaxing the proof-first rule for any component.
-2. **What is the native interface?** Decide linking, data ownership, initialization,
-   threading, platform support, error handling, and upgrades. Where IOA overlaps
-   Lean, choose the required behavioral correspondence.
-3. **Which proof dependencies are allowed?** Decide library/Mathlib support and
-   compiler-backed proof methods under the accepted compiler/runtime trust.
-4. **How are contracts authored and revised?** Conversation generates specs under
-   Temper's existing workflow. Decide how complete component proofs are developed
-   and reviewed, and how a separate contract revision is approved.
-5. **What does the objective manifest contain?** Define its schema, benchmark
-   execution protocol, noise tolerances, multi-objective selection, and search
-   budgets. Objective choice is per episode; benchmark evidence is mandatory.
-6. **How is deployment review recorded?** Identify the reviewer and artifact-bound
-   review action, and define regression/rollback conditions. Candidate lineage
-   advancement never waits for this review.
-7. **How much representation freedom is needed initially?** Keep persisted state
-   and CSDL fixed, or allow alternatives with refinement/migration proofs? Decide
-   whether Lean generates CSDL or checks a separately supplied contract.
+The initial policy allows standard logical axioms and pure definitions/proofs,
+rejects incomplete proofs and custom execution hooks, and trusts the pinned Lean
+compiler/runtime. Benchmarks support latency, throughput, artifact size, and
+separately pinned executables for custom objectives. Review is an explicit local
+operator action; a public review/upload API is not part of this implementation.
+
+Application-specific contracts and generation agents remain in TemperPaw. Broader
+library support, IOA correspondence generation, state-migration proofs, CSDL
+generation, and multi-objective selection remain extensions of this interface.
+Required app-specific correspondence and migration proofs cannot be inferred from
+the kernel's interoperability fixture.
 
 ## Rollout Plan
 
@@ -447,7 +443,7 @@ The direction and spec-first workflow are resolved above. Remaining design work 
 
 ### DST Compliance
 
-This ADR changes no runtime code. A future Lean adapter affecting
+The native adapter lives in `temper-lean` and `temper-platform`. Any adapter affecting
 `temper-runtime`, `temper-jit`, or `temper-server` must run the production path
 inside deterministic simulation. Time, identity, randomness, I/O outcomes, and
 effect results enter through the simulated host boundary; internal collections

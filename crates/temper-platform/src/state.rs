@@ -34,6 +34,8 @@ pub struct PlatformState {
     pub api_token: Option<String>,
     /// In-memory spec storage for pending tenant deployments.
     pub spec_store: Arc<RwLock<SpecStore>>,
+    /// Tenant-scoped, explicitly reviewed native Lean app cores.
+    pub lean: crate::lean::LeanRegistry,
 }
 
 /// Default broadcast channel capacity.
@@ -97,6 +99,7 @@ impl PlatformState {
             api_key,
             api_token: None,
             spec_store,
+            lean: crate::lean::LeanRegistry::default(),
         };
         state.server.bound_action_hook = Some(Arc::new(
             crate::genesis_install::GenesisInstallHook::new(state.clone()),
@@ -132,6 +135,7 @@ impl PlatformState {
             api_key,
             api_token: None,
             spec_store,
+            lean: crate::lean::LeanRegistry::default(),
         };
         state.server.bound_action_hook = Some(Arc::new(
             crate::genesis_install::GenesisInstallHook::new(state.clone()),

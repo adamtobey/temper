@@ -67,6 +67,7 @@ pub async fn run(
     actor_backed_type: Vec<String>,
     observe: bool,
     verify_subprocess: bool,
+    lean_artifacts: Vec<std::path::PathBuf>,
     discord_bot_token: Option<String>,
     tenant: String,
 ) -> Result<()> {
@@ -86,6 +87,18 @@ pub async fn run(
 
     // Assemble platform state
     let mut state = PlatformState::with_registry(registry, api_key);
+    // Proof checking and native linking happen at startup, never actor dispatch.
+    // Artifact receipts are operator-controlled local inputs and require review.
+    for directory in lean_artifacts {
+        let core = temper_lean::artifact::load_reviewed(&directory)?.load()?;
+        println!(
+            "  Lean core: {}:{} ({})",
+            core.tenant(),
+            core.component(),
+            core.id()
+        );
+        state.lean.install(core)?;
+    }
     let mut pg_actor_runtime_cancel = None;
     state.api_token = std::env::var("TEMPER_API_KEY").ok();
     if state.api_token.is_some() {

@@ -7087,6 +7087,7 @@ dependencies = [
  "temper-codegen",
  "temper-evolution",
  "temper-jit",
+ "temper-lean",
  "temper-mcp",
  "temper-observe",
  "temper-platform",
@@ -7145,6 +7146,20 @@ dependencies = [
  "temper-runtime",
  "temper-spec",
  "thiserror 2.0.18",
+]
+
+[[package]]
+name = "temper-lean"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "libc",
+ "libloading",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
 ]
 
 [[package]]
@@ -7265,6 +7280,7 @@ dependencies = [
  "temper-authz",
  "temper-codegen",
  "temper-jit",
+ "temper-lean",
  "temper-observe",
  "temper-optimize",
  "temper-runtime",

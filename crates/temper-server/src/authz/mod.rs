@@ -26,3 +26,33 @@ pub use policy_persistence::{
     load_and_activate_tenant_policies, persist_and_activate_policy, record_policy_change,
 };
 pub use wasm_gate::{CedarWasmAuthzGate, PermissiveWasmAuthzGate};
+
+/// Authorize a credential-bound kernel service operation and surface a denial
+/// through the existing pending-decision flow. The caller supplies an explicit
+/// resource identity; no request header can manufacture authority here.
+pub async fn require_governed_authorization(
+    state: &crate::state::ServerState,
+    authenticated: &AuthenticatedRequestContext,
+    action: &str,
+    resource_type: &str,
+    resource_id: &str,
+) -> Result<(), (axum::http::StatusCode, String)> {
+    match helpers::require_governed_mutation_auth(
+        state,
+        authenticated,
+        helpers::GovernedMutationAuth {
+            tenant: authenticated.tenant().as_str(),
+            action,
+            resource_type,
+            resource_id,
+            resource_attrs: std::collections::BTreeMap::new(),
+            module_name: None,
+            from_status: None,
+        },
+    )
+    .await
+    {
+        Some(error) => Err(error),
+        None => Ok(()),
+    }
+}

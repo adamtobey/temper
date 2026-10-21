@@ -201,7 +201,15 @@ jobs:
           fetch-depth: 0
 
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libz3-dev
+        run: sudo apt-get update && sudo apt-get install -y libz3-dev elan bubblewrap
+
+      - name: Install pinned Lean and enable isolated proof builds
+        run: |
+          elan toolchain install leanprover/lean4:v4.30.0-rc2
+          # Permit bubblewrap's unprivileged namespaces on this disposable runner.
+          if [ -f /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
 
       - name: Install pinned Rust toolchain
         uses: dtolnay/rust-toolchain@nightly
