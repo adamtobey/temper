@@ -8,6 +8,7 @@ fn manifest() -> Manifest {
         tenant: "proof-tests".into(),
         component: "echo".into(),
         toolchain: "leanprover/lean4:v4.30.0-rc2".into(),
+        abi: Default::default(),
         specification_proofs: vec!["consistent".into()],
         obligations: vec!["preserves".into()],
         objective: None,

@@ -6,6 +6,17 @@ use serde::{Deserialize, Serialize};
 /// Initial native ABI: an owned UTF-8 request and response, usually JSON.
 pub const ABI: &str = "temper.lean.string.v1";
 
+/// Explicit proved program type; legacy packages keep the string boundary.
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum Abi {
+    /// UTF-8 request and response.
+    #[default]
+    StringV1,
+    /// UInt64 parameter and binary buffers, returning a typed error or buffers.
+    BuffersV1,
+}
+
 /// Release whose checker API and native initialization ABI this adapter supports.
 pub const TOOLCHAIN: &str = "leanprover/lean4:v4.30.0-rc2";
 
@@ -21,6 +32,9 @@ pub struct Manifest {
     pub component: String,
     /// Exact Lean toolchain name, including its release version.
     pub toolchain: String,
+    /// Exact native function type, checked against the proved entry point.
+    #[serde(default)]
+    pub abi: Abi,
     /// Required, already-proved declarations in Spec.lean.
     pub specification_proofs: Vec<String>,
     /// Fixed propositions over a program; candidate proofs use the same names.
@@ -39,6 +53,9 @@ pub struct Objective {
     pub direction: Direction,
     /// Requests for the compiled program. Every request is exercised per sample.
     pub inputs: Vec<String>,
+    /// Content-pinned files loaded before timing for the binary batch ABI.
+    #[serde(default)]
+    pub workloads: Vec<BufferWorkload>,
     /// Number of independent samples, aggregated by their median.
     pub samples: u32,
     /// Complete workload repetitions per sample.
@@ -48,6 +65,35 @@ pub struct Objective {
     /// Optional pinned host benchmark for memory, cost, or other custom metrics.
     #[serde(default)]
     pub external: Option<ExternalBenchmark>,
+    /// Native measurement process budget, independent of generation budgets.
+    #[serde(default = "benchmark_seconds")]
+    pub seconds: u64,
+}
+
+fn benchmark_seconds() -> u64 {
+    60
+}
+
+/// One invocation against pre-generated files; generating/reading files is untimed.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct BufferWorkload {
+    /// Human-readable workload/distribution name.
+    pub name: String,
+    /// Typed parameter interpreted by the fixed app specification.
+    pub parameter: u64,
+    /// Input buffers with exact, immutable content identities.
+    pub files: Vec<InputFile>,
+}
+
+/// A file whose bytes, not a mutable filename alone, define a benchmark input.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct InputFile {
+    /// Absolute path to a pre-generated workload file.
+    pub path: std::path::PathBuf,
+    /// Ordinary SHA-256, checked and snapshotted at the specification gate.
+    pub sha256: String,
 }
 
 /// Trusted benchmark executable, fixed before candidate generation.
@@ -68,6 +114,8 @@ pub struct ExternalBenchmark {
 pub enum Metric {
     /// Median elapsed nanoseconds per complete workload through the native ABI.
     LatencyNs,
+    /// Process CPU nanoseconds per compaction, excluding untimed workload loading.
+    CpuNs,
     /// Size in bytes of the native library, measured after running the workload.
     ArtifactBytes,
     /// Requests per second through the native ABI for the fixed workload.
@@ -115,9 +163,46 @@ impl Manifest {
         }
         if let Some(objective) = &self.objective {
             ensure!(
-                (1..=1024).contains(&objective.inputs.len()),
-                "benchmark requires 1..=1024 inputs"
+                objective.metric != Metric::CpuNs || self.abi == Abi::BuffersV1,
+                "CPU-time measurement requires the binary ABI benchmark"
             );
+            ensure!(
+                match self.abi {
+                    Abi::StringV1 =>
+                        (1..=1024).contains(&objective.inputs.len())
+                            && objective.workloads.is_empty(),
+                    Abi::BuffersV1 =>
+                        objective.inputs.is_empty()
+                            && (1..=1024).contains(&objective.workloads.len()),
+                },
+                "benchmark inputs must match the selected ABI"
+            );
+            ensure!(
+                (1..=3600).contains(&objective.seconds),
+                "invalid benchmark time budget"
+            );
+            let mut names = std::collections::BTreeSet::new();
+            for workload in &objective.workloads {
+                ensure!(
+                    names.insert(&workload.name),
+                    "duplicate binary workload name"
+                );
+                ensure!(
+                    !workload.name.is_empty() && !workload.files.is_empty(),
+                    "binary workloads need a name and files"
+                );
+                for file in &workload.files {
+                    ensure!(
+                        file.path.is_absolute()
+                            && file.sha256.len() == 64
+                            && file
+                                .sha256
+                                .bytes()
+                                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)),
+                        "binary workload needs absolute paths and SHA-256"
+                    );
+                }
+            }
             ensure!(
                 objective.inputs.iter().all(|s| s.len() <= 16 * 1024 * 1024),
                 "benchmark input exceeds 16 MiB"

@@ -1,0 +1,21 @@
+[package]
+name = "temper-lean-ffi-bridge"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+# This trusted adapter is built on demand, never by candidate source. Ordinary
+# Temper builds do not require Lean, libclang, or these build dependencies.
+[workspace]
+
+[lib]
+path = "bridge.rs"
+crate-type = ["staticlib"]
+
+[dependencies]
+lean-ffi = { git = "https://github.com/argumentcomputer/lean-ffi", rev = "b4beefd55352ad1d864562b1f15cb52db6186b2d" }
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+debug = false

@@ -201,7 +201,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libz3-dev elan bubblewrap
+        run: sudo apt-get update && sudo apt-get install -y libz3-dev elan bubblewrap libclang-dev
 
       - name: Install pinned Lean and enable isolated proof builds
         run: |
@@ -235,6 +235,9 @@ jobs:
           for module in gepa-replay gepa-reflective gepa-score gepa-pareto gepa-verify; do
             (cd "wasm-modules/$module" && cargo build --target wasm32-unknown-unknown --release)
           done
+
+      - name: Prepare pinned typed Lean FFI adapter
+        run: cargo run -p temper-lean -- setup-ffi
 
       - name: cargo nextest run --workspace (skip dst_)
         run: cargo nextest run --workspace -E 'not test(dst_)'

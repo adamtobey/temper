@@ -1,0 +1,12 @@
+{
+  "metric": "cpu_ns",
+  "samples": 5,
+  "iterations": 1,
+  "minimum_improvement": 0.02,
+  "seconds": 900,
+  "profiles": [
+    {"name": "hot-skew", "seed": 182, "rows": 65536, "files": 8, "outputs": 8},
+    {"name": "high-cardinality", "seed": 183, "rows": 32768, "files": 4, "outputs": 8},
+    {"name": "wide-unicode", "seed": 184, "rows": 16384, "files": 2, "outputs": 4}
+  ]
+}

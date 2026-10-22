@@ -6,8 +6,8 @@ use crate::{
     toolchain::{Toolchain, VerifiedCandidate, VerifiedSpec},
 };
 use anyhow::{Context, Result, ensure};
-use serde::Serialize;
-use std::collections::BTreeMap;
+use serde::{Deserialize, Serialize};
+use std::collections::{BTreeMap, BTreeSet};
 
 struct Selection {
     best: Option<(String, f64)>,
@@ -44,7 +44,7 @@ impl Selection {
 }
 
 /// Recorded outcome for one bounded generation, including rejected candidates.
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Attempt {
     /// Parent selected before this generation, absent for initial synthesis.
     pub parent: Option<String>,
@@ -56,12 +56,22 @@ pub struct Attempt {
     pub accepted: bool,
     /// Diagnostic for a rejected/inconclusive generation.
     pub diagnostic: Option<String>,
+    /// Exact proposal, including failed proofs, for repair and durable checkpoints.
+    #[serde(default)]
+    pub source: Option<String>,
+    /// Per-workload medians for a binary workload suite.
+    #[serde(default)]
+    pub measurements: BTreeMap<String, f64>,
+    /// Fresh incumbent measurement used to confirm an apparent improvement.
+    #[serde(default)]
+    pub reference_measurement: Option<f64>,
 }
 
 /// External generators receive only the fixed specification and current parent.
 /// App-specific prompts, models, and agents live outside the Temper kernel.
 pub trait Proposer {
-    /// Return implementation source, or None when search has finished.
+    /// Return implementation source, or None for an empty attempt. Empty output
+    /// does not end the bounded campaign; failures and empty attempts are recorded.
     fn propose(
         &mut self,
         spec: &VerifiedSpec,
@@ -77,6 +87,7 @@ pub struct Episode {
     selection: Selection,
     candidates: BTreeMap<String, VerifiedCandidate>,
     history: Vec<Attempt>,
+    sources: BTreeSet<String>,
 }
 
 impl Episode {
@@ -96,47 +107,100 @@ impl Episode {
             },
             candidates: BTreeMap::new(),
             history: Vec::new(),
+            sources: BTreeSet::new(),
         })
     }
 
     /// Submit a generation. Failed proofs and inconclusive work consume budget
     /// and preserve the last accepted parent. No review is needed for search.
     pub fn submit(&mut self, source: String) -> Result<&Attempt> {
+        let parent = self.selection.best.as_ref().map(|p| p.0.clone());
+        self.submit_from(source, parent)
+    }
+
+    fn submit_from(&mut self, source: String, parent: Option<String>) -> Result<&Attempt> {
         ensure!(
             self.history.len() < self.budget as usize,
             "candidate budget exhausted"
         );
         let mut attempt = Attempt {
-            parent: self.selection.best.as_ref().map(|p| p.0.clone()),
+            parent,
             candidate: None,
             measurement: None,
             accepted: false,
             diagnostic: None,
+            source: Some(source.clone()),
+            measurements: BTreeMap::new(),
+            reference_measurement: None,
         };
-        let result = Toolchain
-            .check(&self.spec, source)
-            .and_then(VerifiedCandidate::benchmark);
+        if !self.sources.insert(crate::identity(&[source.as_bytes()])) {
+            attempt.diagnostic =
+                Some("duplicate proposal; no proof/benchmark work repeated".into());
+            self.history.push(attempt);
+            return Ok(self.history.last().expect("recorded duplicate"));
+        }
+        let result = Toolchain.check(&self.spec, source).and_then(|candidate| {
+            ensure!(
+                !self
+                    .candidates
+                    .values()
+                    .any(|prior| prior.artifact_hash() == candidate.artifact_hash()),
+                "identical native executable; measurement skipped"
+            );
+            candidate.benchmark()
+        });
         match result {
             Ok((candidate, score)) => {
                 attempt.candidate = Some(candidate.id.clone());
                 attempt.measurement = Some(score);
+                attempt.measurements = candidate.measurements.clone();
                 let objective = self
                     .spec
                     .manifest
                     .objective
                     .as_ref()
                     .expect("validated objective");
-                match self.selection.select(
-                    &candidate.id,
-                    score,
-                    objective.direction,
-                    objective.minimum_improvement,
-                ) {
+                let (direction, threshold) = (objective.direction, objective.minimum_improvement);
+                let beats = |old: f64| match direction {
+                    Direction::Minimize => score < old * (1.0 - threshold),
+                    Direction::Maximize => score > old * (1.0 + threshold),
+                };
+                let mut confirmed = true;
+                if self
+                    .selection
+                    .best
+                    .as_ref()
+                    .is_some_and(|(_, old)| beats(*old))
+                {
+                    let reference = self.best().expect("incumbent retained").clone();
+                    match reference.benchmark() {
+                        Ok((_, value)) => {
+                            attempt.reference_measurement = Some(value);
+                            confirmed = beats(value);
+                            if !confirmed {
+                                attempt.diagnostic = Some("apparent gain not confirmed against freshly measured incumbent".into());
+                            }
+                        }
+                        Err(error) => {
+                            confirmed = false;
+                            attempt.diagnostic =
+                                Some(format!("incumbent confirmation inconclusive: {error:#}"));
+                        }
+                    }
+                }
+                if !confirmed {
+                    self.candidates.insert(candidate.id.clone(), candidate);
+                    self.history.push(attempt);
+                    return Ok(self.history.last().expect("recorded confirmation"));
+                }
+                match self
+                    .selection
+                    .select(&candidate.id, score, direction, threshold)
+                {
                     Ok(accepted) => {
                         attempt.accepted = accepted;
-                        if accepted {
-                            self.candidates.insert(candidate.id.clone(), candidate);
-                        }
+                        // Retain verified alternatives for exploration, not just improvements.
+                        self.candidates.insert(candidate.id.clone(), candidate);
                     }
                     Err(error) => attempt.diagnostic = Some(error.to_string()),
                 }
@@ -150,20 +214,61 @@ impl Episode {
     /// Run an external proposer iteratively, feeding every verified improvement
     /// into the next generation. This method never deploys an artifact.
     pub fn run(&mut self, proposer: &mut impl Proposer) -> Result<()> {
+        self.run_observed(proposer, |_, _| Ok(()))
+    }
+
+    /// Run the entire attempt budget and checkpoint after every proposal.
+    /// Empty responses and provider failures consume one attempt, not the campaign.
+    pub fn run_observed(
+        &mut self,
+        proposer: &mut impl Proposer,
+        mut checkpoint: impl FnMut(Option<&VerifiedCandidate>, &[Attempt]) -> Result<()>,
+    ) -> Result<()> {
         while self.history.len() < self.budget as usize {
-            match proposer.propose(&self.spec, self.best(), &self.history) {
+            let best_id = self.selection.best.as_ref().map(|p| p.0.as_str());
+            let stagnant = self
+                .history
+                .iter()
+                .rev()
+                .take_while(|a| !a.accepted)
+                .count();
+            // Periodically explore a verified alternative after three stalled attempts.
+            let parent = if stagnant >= 3 && self.candidates.len() > 1 {
+                self.candidates
+                    .values()
+                    .filter(|c| Some(c.id()) != best_id)
+                    .nth((stagnant - 3) % (self.candidates.len() - 1))
+                    .or_else(|| self.best())
+            } else {
+                self.best()
+            };
+            let parent_id = parent.map(|p| p.id().to_string());
+            match proposer.propose(&self.spec, parent, &self.history) {
                 Ok(Some(source)) => {
-                    self.submit(source)?;
+                    self.submit_from(source, parent_id)?;
                 }
-                Ok(None) => break,
+                Ok(None) => self.history.push(Attempt {
+                    parent: parent_id,
+                    candidate: None,
+                    measurement: None,
+                    accepted: false,
+                    diagnostic: Some("empty proposal; campaign continues within its budget".into()),
+                    source: None,
+                    measurements: BTreeMap::new(),
+                    reference_measurement: None,
+                }),
                 Err(error) => self.history.push(Attempt {
-                    parent: self.selection.best.as_ref().map(|p| p.0.clone()),
+                    parent: parent_id,
                     candidate: None,
                     measurement: None,
                     accepted: false,
                     diagnostic: Some(format!("proposal failed: {error:#}")),
+                    source: None,
+                    measurements: BTreeMap::new(),
+                    reference_measurement: None,
                 }),
             }
+            checkpoint(self.best(), &self.history)?;
         }
         Ok(())
     }

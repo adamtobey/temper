@@ -1,0 +1,298 @@
+{
+  "date": "2026-10-22",
+  "kernel_base_revision": "73590d25",
+  "kernel_source_sha256": {
+    "crates/temper-lean/src/toolchain.rs": "967e477bb30914d61cb89f995a54da34596850f5745899543b431b762bc1d46b",
+    "crates/temper-lean/src/native.rs": "afe1afc6154726dd88603ba9dc3648214a5a337a542fe325667b6534fab512d9",
+    "crates/temper-lean/src/buffers.rs": "6a29d41a5015f668b7eb13f679c49c07bafc5dbe6f4671ab0189dbb074abfe14",
+    "crates/temper-lean/lean/Check.lean": "3c8063c86224b48cfb2cb1b344bc14b8f87b26d2349ee7adbed3525a7232d5a1",
+    "crates/temper-lean/bridge/bridge.rs": "f26cce9bbd0ee02393e7023a8c599b6944951e4c63358d336b0b7f0404a4af14",
+    "crates/temper-lean/bridge/Cargo.toml": "7cd882702173fce4a09f6805316385aa05694fb108ebe119209613eb2b265715",
+    "crates/temper-lean/bridge/Cargo.lock": "7f624aead234b135337a4dee6a748017d916b70754d0b9820ac8ce4a3570ba3e"
+  },
+  "environment": {
+    "host": "Apple M4 Max",
+    "architecture": "arm64",
+    "os": "macOS",
+    "rust": "1.95",
+    "lean": "leanprover/lean4:v4.30.0-rc2",
+    "lean_commit": "3dc1a088b6d2d8eafe25a7cd7ec7b58d731bd7cc",
+    "native_optimization": "-O3",
+    "macos_release_link": "-Wl,-S omits non-executable debug-map paths"
+  },
+  "ffi": {
+    "upstream": "https://github.com/argumentcomputer/lean-ffi",
+    "revision": "b4beefd55352ad1d864562b1f15cb52db6186b2d",
+    "abi": "buffers_v1",
+    "program_type": "UInt64 → Array ByteArray → Except String (Array ByteArray)",
+    "input_copies": 1,
+    "borrowed_output_copies": 0,
+    "legacy_string_abi_supported": true
+  },
+  "proof_boundary": {
+    "specification_complete_before_implementation_generation": true,
+    "specification_edited_during_search": false,
+    "binary_spec_sha256": "24b71f14ec8c3fe7fde93d6befe7dce587f31456e9d2cc360bbe7323e665cdc0",
+    "prepared_manifest_sha256": "edf991f193f65f0523947a54ce4995963b6b9fc13c2d68402e0b5674fef7e8bd",
+    "legacy_spec_unchanged_sha256": "21477442c0162f5b1c82c5e2d601997ef2e03f71e9e73ce95f2a2927ed216a23",
+    "general_encoder_reader_roundtrip_theorem": false,
+    "compiler_runtime_ffi_trusted": true
+  },
+  "workload": {
+    "profiles": [
+      {
+        "name": "hot-skew",
+        "seed": 182,
+        "rows": 65536,
+        "files": 8,
+        "outputs": 8,
+        "bytes": 2529628,
+        "file_bytes": [
+          316591,
+          316021,
+          316285,
+          315681,
+          315806,
+          316480,
+          315891,
+          316873
+        ],
+        "duplicate_rows": 5957,
+        "unique_tags": 803
+      },
+      {
+        "name": "high-cardinality",
+        "seed": 183,
+        "rows": 32768,
+        "files": 4,
+        "outputs": 8,
+        "bytes": 5514007,
+        "file_bytes": [
+          1379068,
+          1377910,
+          1377167,
+          1379862
+        ],
+        "duplicate_rows": 2978,
+        "unique_tags": 64869
+      },
+      {
+        "name": "wide-unicode",
+        "seed": 184,
+        "rows": 16384,
+        "files": 2,
+        "outputs": 4,
+        "bytes": 6458702,
+        "file_bytes": [
+          3230071,
+          3228631
+        ],
+        "duplicate_rows": 1489,
+        "unique_tags": 19026
+      }
+    ],
+    "total_bytes": 14502337,
+    "spec_sha256": "24b71f14ec8c3fe7fde93d6befe7dce587f31456e9d2cc360bbe7323e665cdc0",
+    "manifest_sha256": "edf991f193f65f0523947a54ce4995963b6b9fc13c2d68402e0b5674fef7e8bd",
+    "python": "3.9.6",
+    "generation_timed": false,
+    "file_loading_timed": false
+  },
+  "objective": {
+    "metric": "cpu_ns",
+    "direction": "minimize",
+    "aggregation": "arithmetic mean of three per-workload medians",
+    "samples_per_workload": 5,
+    "iterations_per_sample": 1,
+    "minimum_improvement": 0.02,
+    "clock": "CLOCK_PROCESS_CPUTIME_ID",
+    "excluded": [
+      "file generation",
+      "input file loading",
+      "proof checking",
+      "compilation",
+      "process/module initialization",
+      "warmup"
+    ],
+    "included": [
+      "one copy of each input into Lean",
+      "parsing",
+      "sorting/partitioning",
+      "dictionary/index construction",
+      "byte encoding",
+      "borrowed-output inspection",
+      "result cleanup"
+    ]
+  },
+  "campaign": {
+    "proposer": "binary/mutate.py",
+    "model_invoked": false,
+    "family": {
+      "dictionary_orders": 4,
+      "index_representations": 2,
+      "encoding_strategies": 3
+    },
+    "attempt_budget": 32,
+    "measured_implementations": 24,
+    "accepted_improvements_after_seed": 3,
+    "empty_attempts_after_finite_family_exhausted": 8,
+    "independently_typechecked_templates": 24,
+    "receipt": {
+      "candidate": "480c6df9b1a6f0cb074a5d8b7345d0ca2e2a43d6b4ced691a588f058e9ac080a",
+      "specification": "1f585661837bde3cc3db741e61e5513063769701967b257e74015409d5410fcd",
+      "artifact_hash": "8a132641e492638bf84c66a55615c8c9f2ed981f6b3a4cc0f14d99130966e2d9",
+      "reviewer": null
+    },
+    "history": [
+      {"parent":null,"candidate":"3b16f062d93abc28a32be9fe3100cdbfe372e6add800b23fae68fc365163a279","measurement":1541956000,"accepted":true,"diagnostic":null,"measurements":{"high-cardinality":1075441000,"hot-skew":1110455000,"wide-unicode":2439972000},"reference_measurement":null,"proposal_header":"import Spec"},
+      {"parent":"3b16f062d93abc28a32be9fe3100cdbfe372e6add800b23fae68fc365163a279","candidate":"107837d51968723de1873444573525e7bd95649b6145754ec4d926dfd280f65a","measurement":1501491333.3333333,"accepted":true,"diagnostic":null,"measurements":{"high-cardinality":1027670000,"hot-skew":1072498000,"wide-unicode":2404306000},"reference_measurement":1532631000,"proposal_header":"-- raw-search-config {\"cache\": \"tree\", \"codec\": \"bytes\", \"dictionary\": \"ascending\"}"},
+      {"parent":"107837d51968723de1873444573525e7bd95649b6145754ec4d926dfd280f65a","candidate":"9ed439b41064a838f901b2be93c03c6865c9ffbb48c11afcc26a0afa41590885","measurement":1433559333.3333333,"accepted":true,"diagnostic":null,"measurements":{"high-cardinality":962199000,"hot-skew":1044606000,"wide-unicode":2293873000},"reference_measurement":1514957666.6666667,"proposal_header":"-- raw-search-config {\"cache\": \"tree\", \"codec\": \"stream\", \"dictionary\": \"ascending\"}"},
+      {"parent":"9ed439b41064a838f901b2be93c03c6865c9ffbb48c11afcc26a0afa41590885","candidate":"480c6df9b1a6f0cb074a5d8b7345d0ca2e2a43d6b4ced691a588f058e9ac080a","measurement":1391504000,"accepted":true,"diagnostic":null,"measurements":{"high-cardinality":910777000,"hot-skew":1014831000,"wide-unicode":2248904000},"reference_measurement":1430834333.3333333,"proposal_header":"-- raw-search-config {\"cache\": \"hash\", \"codec\": \"stream\", \"dictionary\": \"ascending\"}"},
+      {"parent":"480c6df9b1a6f0cb074a5d8b7345d0ca2e2a43d6b4ced691a588f058e9ac080a","candidate":"556642c60fdb7930a6264edb38d0ab317a2aedf97fd3b5639102141401e61639","measurement":1555884666.6666667,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1067170000,"hot-skew":1116612000,"wide-unicode":2483872000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"hash\", \"codec\": \"list\", \"dictionary\": \"ascending\"}"},
+      {"parent":"480c6df9b1a6f0cb074a5d8b7345d0ca2e2a43d6b4ced691a588f058e9ac080a","candidate":"02b75b547f3475a3d3bd43fc152a6dbb38bf7410e8ccd0286085076e89697bcf","measurement":1511082000,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1041545000,"hot-skew":1055944000,"wide-unicode":2435757000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"hash\", \"codec\": \"bytes\", \"dictionary\": \"ascending\"}"},
+      {"parent":"480c6df9b1a6f0cb074a5d8b7345d0ca2e2a43d6b4ced691a588f058e9ac080a","candidate":"7cd85533a4faf10d89a6965e297176bcbe76978164e13af3fc68fc46abbaca9a","measurement":1389950333.3333333,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":907243000,"hot-skew":1014833000,"wide-unicode":2247775000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"hash\", \"codec\": \"stream\", \"dictionary\": \"descending\"}"},
+      {"parent":"02b75b547f3475a3d3bd43fc152a6dbb38bf7410e8ccd0286085076e89697bcf","candidate":"a4e9eeb5440db13b0e40ed88be8fec0469c4142054f840c8273714d75761cd7c","measurement":1470653000,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":993467000,"hot-skew":1047507000,"wide-unicode":2370985000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"hash\", \"codec\": \"bytes\", \"dictionary\": \"descending\"}"},
+      {"parent":"107837d51968723de1873444573525e7bd95649b6145754ec4d926dfd280f65a","candidate":"bd9c4a2ec6b7eda0aee2f496db79d7eee10a0384f2fb79fdd75a853ff425bab3","measurement":1514661000,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1055341000,"hot-skew":1078906000,"wide-unicode":2409736000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"tree\", \"codec\": \"bytes\", \"dictionary\": \"descending\"}"},
+      {"parent":"3b16f062d93abc28a32be9fe3100cdbfe372e6add800b23fae68fc365163a279","candidate":"1bf81f0c8a02db2aa9e163a8e8227b7adbaf0039a49c84c3c007e4a90f0e5e9a","measurement":1542428333.3333333,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1088415000,"hot-skew":1102706000,"wide-unicode":2436164000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"tree\", \"codec\": \"list\", \"dictionary\": \"descending\"}"},
+      {"parent":"3b16f062d93abc28a32be9fe3100cdbfe372e6add800b23fae68fc365163a279","candidate":"6a77a017546c66b8fe5a744e64cec96c7d3492e107117d6bc9674bd998fb6fd5","measurement":1539301333.3333333,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1069871000,"hot-skew":1104497000,"wide-unicode":2443536000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"tree\", \"codec\": \"list\", \"dictionary\": \"short-first\"}"},
+      {"parent":"556642c60fdb7930a6264edb38d0ab317a2aedf97fd3b5639102141401e61639","candidate":"a0451b599c7095bbf09f7b39b9121a1fa1b17f8a33c6691a534aa1d5802fe5a4","measurement":1499527000,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1031028000,"hot-skew":1076624000,"wide-unicode":2390929000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"hash\", \"codec\": \"list\", \"dictionary\": \"descending\"}"},
+      {"parent":"6a77a017546c66b8fe5a744e64cec96c7d3492e107117d6bc9674bd998fb6fd5","candidate":"6380003b032c23244a6afd3be4054675790654b2c5b16ee7289b2709a234e0b8","measurement":1506634666.6666667,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1037259000,"hot-skew":1080223000,"wide-unicode":2402422000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"tree\", \"codec\": \"bytes\", \"dictionary\": \"short-first\"}"},
+      {"parent":"6a77a017546c66b8fe5a744e64cec96c7d3492e107117d6bc9674bd998fb6fd5","candidate":"c22198ffcfd3ad73baa3efe1706b27b721c74e83fb9c4880d27240e8fb734567","measurement":1430095666.6666667,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":959279000,"hot-skew":1041228000,"wide-unicode":2289780000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"tree\", \"codec\": \"stream\", \"dictionary\": \"short-first\"}"},
+      {"parent":"7cd85533a4faf10d89a6965e297176bcbe76978164e13af3fc68fc46abbaca9a","candidate":"cd4979bb0b973d71f9f5193013be28d9b191ac06c06857bbc088b62fa6e51057","measurement":1438898666.6666667,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":974656000,"hot-skew":1044733000,"wide-unicode":2297307000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"tree\", \"codec\": \"stream\", \"dictionary\": \"descending\"}"},
+      {"parent":"9ed439b41064a838f901b2be93c03c6865c9ffbb48c11afcc26a0afa41590885","candidate":"ae7ccca481d1439d28d15478dccda0adb6122466039cfd8a26e9140ad7e5f490","measurement":1431304333.3333333,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":961181000,"hot-skew":1036855000,"wide-unicode":2295877000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"tree\", \"codec\": \"stream\", \"dictionary\": \"long-first\"}"},
+      {"parent":"a0451b599c7095bbf09f7b39b9121a1fa1b17f8a33c6691a534aa1d5802fe5a4","candidate":"a6dc1ab7bac9a012a79584d7b9c78cf53c97f6ce7ca39820bebc6aeed7697737","measurement":1511260000,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1039734000,"hot-skew":1082378000,"wide-unicode":2411668000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"hash\", \"codec\": \"list\", \"dictionary\": \"short-first\"}"},
+      {"parent":"a4e9eeb5440db13b0e40ed88be8fec0469c4142054f840c8273714d75761cd7c","candidate":"ed70ccbfb038550d739297d9566d3f6321c6b8b6bc46f460721a67f39d6caefa","measurement":1470162333.3333333,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1005172000,"hot-skew":1047419000,"wide-unicode":2357896000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"hash\", \"codec\": \"bytes\", \"dictionary\": \"short-first\"}"},
+      {"parent":"a6dc1ab7bac9a012a79584d7b9c78cf53c97f6ce7ca39820bebc6aeed7697737","candidate":"3ea04d86cc3838b2db6c5fecf7c43935f28b35cab465c2980968bcdd46855b45","measurement":1396564000,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":917296000,"hot-skew":1011661000,"wide-unicode":2260735000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"hash\", \"codec\": \"stream\", \"dictionary\": \"short-first\"}"},
+      {"parent":"a6dc1ab7bac9a012a79584d7b9c78cf53c97f6ce7ca39820bebc6aeed7697737","candidate":"d03ffb71ba9adb78940764fcb6fd1abe82bd06eadd585b47d05e28fb879072dd","measurement":1508912000,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1037342000,"hot-skew":1080190000,"wide-unicode":2409204000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"hash\", \"codec\": \"list\", \"dictionary\": \"long-first\"}"},
+      {"parent":"ae7ccca481d1439d28d15478dccda0adb6122466039cfd8a26e9140ad7e5f490","candidate":"5db3d09c8043cc29bf705e0aaec053ec074a6502de4f7a16d33776d3ece511ab","measurement":1540250000,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1075981000,"hot-skew":1103399000,"wide-unicode":2441370000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"tree\", \"codec\": \"list\", \"dictionary\": \"long-first\"}"},
+      {"parent":"ae7ccca481d1439d28d15478dccda0adb6122466039cfd8a26e9140ad7e5f490","candidate":"6df905d694b3c61e783e837fce5fa38c9fbdeaad7820e850c6d90221bdbb14e6","measurement":1516580333.3333333,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1046354000,"hot-skew":1075428000,"wide-unicode":2427959000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"tree\", \"codec\": \"bytes\", \"dictionary\": \"long-first\"}"},
+      {"parent":"ae7ccca481d1439d28d15478dccda0adb6122466039cfd8a26e9140ad7e5f490","candidate":"81aa046c214f4a86802836e6e01dce3517b28dfe82127d6454e4c761ee1f7bff","measurement":1422895000,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":933469000,"hot-skew":1032373000,"wide-unicode":2302843000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"hash\", \"codec\": \"stream\", \"dictionary\": \"long-first\"}"},
+      {"parent":"ae7ccca481d1439d28d15478dccda0adb6122466039cfd8a26e9140ad7e5f490","candidate":"976ba66522b7f9224b8d270dfa689fba6a913607ea4d510e999c58bb3ea61f0a","measurement":1468974333.3333333,"accepted":false,"diagnostic":null,"measurements":{"high-cardinality":1000170000,"hot-skew":1046758000,"wide-unicode":2359995000},"reference_measurement":null,"proposal_header":"-- raw-search-config {\"cache\": \"hash\", \"codec\": \"bytes\", \"dictionary\": \"long-first\"}"},
+      {"parent":"ae7ccca481d1439d28d15478dccda0adb6122466039cfd8a26e9140ad7e5f490","candidate":null,"measurement":null,"accepted":false,"diagnostic":"empty proposal; campaign continues within its budget","measurements":{},"reference_measurement":null,"proposal_header":null},
+      {"parent":"bd9c4a2ec6b7eda0aee2f496db79d7eee10a0384f2fb79fdd75a853ff425bab3","candidate":null,"measurement":null,"accepted":false,"diagnostic":"empty proposal; campaign continues within its budget","measurements":{},"reference_measurement":null,"proposal_header":null},
+      {"parent":"c22198ffcfd3ad73baa3efe1706b27b721c74e83fb9c4880d27240e8fb734567","candidate":null,"measurement":null,"accepted":false,"diagnostic":"empty proposal; campaign continues within its budget","measurements":{},"reference_measurement":null,"proposal_header":null},
+      {"parent":"cd4979bb0b973d71f9f5193013be28d9b191ac06c06857bbc088b62fa6e51057","candidate":null,"measurement":null,"accepted":false,"diagnostic":"empty proposal; campaign continues within its budget","measurements":{},"reference_measurement":null,"proposal_header":null},
+      {"parent":"d03ffb71ba9adb78940764fcb6fd1abe82bd06eadd585b47d05e28fb879072dd","candidate":null,"measurement":null,"accepted":false,"diagnostic":"empty proposal; campaign continues within its budget","measurements":{},"reference_measurement":null,"proposal_header":null},
+      {"parent":"ed70ccbfb038550d739297d9566d3f6321c6b8b6bc46f460721a67f39d6caefa","candidate":null,"measurement":null,"accepted":false,"diagnostic":"empty proposal; campaign continues within its budget","measurements":{},"reference_measurement":null,"proposal_header":null},
+      {"parent":"02b75b547f3475a3d3bd43fc152a6dbb38bf7410e8ccd0286085076e89697bcf","candidate":null,"measurement":null,"accepted":false,"diagnostic":"empty proposal; campaign continues within its budget","measurements":{},"reference_measurement":null,"proposal_header":null},
+      {"parent":"107837d51968723de1873444573525e7bd95649b6145754ec4d926dfd280f65a","candidate":null,"measurement":null,"accepted":false,"diagnostic":"empty proposal; campaign continues within its budget","measurements":{},"reference_measurement":null,"proposal_header":null}
+    ],
+    "relative_cpu_reduction": 0.09757217456269829,
+    "local_artifact": "/private/tmp/temper-raw-binary-final",
+    "note": "Campaign preceded final snapshot/checker/linker hardening. Exact selected source was rechecked and remeasured under the final kernel, below. Eight empty attempts are not eight novel algorithm proposals."
+  },
+  "final_confirmation": {
+    "receipt": {
+      "candidate": "6e032c54525939e9118fa03441632d78a86ace3027fb54cf634fd211124d5f1f",
+      "specification": "457fe60711f023b00bc2ed32df508ca234bfb3f039dd267d98511a8de4ade760",
+      "artifact_hash": "002ab6e3d66a35cd2d27f6e132c475121b56155b775cfec44dcf872f7e9962b9",
+      "reviewer": null
+    },
+    "native_file_sha256": "455ae748b85f6cfdcf475613b2e361825ede151892cfd44d30afa14dee265523",
+    "history": [
+      {
+        "parent": null,
+        "candidate": "e4bc7f817277da8cf1cdb46d0116878db573aeaa1eb2963056e9d82945643c7f",
+        "measurement": 1595305000,
+        "accepted": true,
+        "diagnostic": null,
+        "measurements": {
+          "high-cardinality": 1116437000,
+          "hot-skew": 1145117000,
+          "wide-unicode": 2524361000
+        },
+        "reference_measurement": null,
+        "proposal_header": "import Spec"
+      },
+      {
+        "parent": "e4bc7f817277da8cf1cdb46d0116878db573aeaa1eb2963056e9d82945643c7f",
+        "candidate": "6e032c54525939e9118fa03441632d78a86ace3027fb54cf634fd211124d5f1f",
+        "measurement": 1427281000,
+        "accepted": true,
+        "diagnostic": null,
+        "measurements": {
+          "high-cardinality": 938885000,
+          "hot-skew": 1039304000,
+          "wide-unicode": 2303654000
+        },
+        "reference_measurement": 1565667000,
+        "proposal_header": "-- raw-search-config {\"cache\": \"hash\", \"codec\": \"stream\", \"dictionary\": \"ascending\"}"
+      }
+    ],
+    "relative_cpu_reduction": 0.10532406028941177,
+    "relative_cpu_reduction_vs_fresh_incumbent": 0.0883878883568473,
+    "local_artifact": "/private/tmp/temper-raw-binary-verified-final",
+    "winner_source": "binary/Optimized.lean",
+    "winner_source_sha256": "526c30c8b2c2fdb481f4212b60096fe99ef2cf411ca2c950de3e309fff14ffd6"
+  },
+  "transport_identity_microbenchmark": {
+    "samples": 7,
+    "clock": "CLOCK_PROCESS_CPUTIME_ID",
+    "cases": [
+      {
+        "bytes": 64,
+        "string_cpu_ns": 248.6,
+        "borrowed_buffers_cpu_ns": 251.1
+      },
+      {
+        "bytes": 1048576,
+        "string_cpu_ns": 1503240,
+        "borrowed_buffers_cpu_ns": 13200
+      }
+    ],
+    "note": "Complete host API identity-call measurements with resident identical payload. Not a RAW compaction speedup; local empirical timing, no flaky performance assertion.",
+    "setup_untimed": true
+  },
+  "independent_validation": {
+    "candidate": "6e032c54525939e9118fa03441632d78a86ace3027fb54cf634fd211124d5f1f",
+    "artifact_hash": "002ab6e3d66a35cd2d27f6e132c475121b56155b775cfec44dcf872f7e9962b9",
+    "seeded_cases": 64,
+    "replays": 64,
+    "checked_rows": 123963,
+    "invalid_requests": 6,
+    "original_example_rows": 6,
+    "test_only": true,
+    "reviewer": null
+  },
+  "verification": {
+    "lean_suite": {
+      "passed": 16,
+      "compile_fail_doctests": 1,
+      "manual_timing_test_run_separately": true
+    },
+    "proposer_adapter_tests": 4,
+    "platform_native_http_integration": 1,
+    "platform_e2e_dst": 6,
+    "system_entity_dst": 33,
+    "live": {
+      "health_status": 200,
+      "csdl_xml_valid": true,
+      "unauthenticated_lean_status": 401,
+      "isolated_server_stopped": true
+    },
+    "ioa_cascade": {
+      "L0": true,
+      "L1": true,
+      "L2": true,
+      "L3": true
+    },
+    "format_and_clippy": true,
+    "binary_persist_rebuild_review_reload_regression": "failed before omitting random macOS debug-map archive paths; passed after fix",
+    "workspace_limit": "9 temper-actor-runtime Postgres-container tests could not start: /var/run/docker.sock absent",
+    "static_determinism_audit": "21 pre-existing patterns in unchanged simulation-visible server files",
+    "linux_native_execution": "not run locally; CI configured"
+  },
+  "deployment": {
+    "reviewer": null,
+    "deployed": false,
+    "approved": false,
+    "invoke_buffers_refusal": "deployment review is required",
+    "invocation_output_directory_created": false
+  },
+  "model_adapter": {
+    "worker": "binary/model_proposer.py",
+    "configuration": "TEMPER_LEAN_MODEL_COMMAND JSON argv; prompt stdin, final Lean stdout",
+    "model_invoked": false,
+    "note": "Adapter exercised with a fake inference command in unit tests, not a real model integration campaign."
+  }
+}

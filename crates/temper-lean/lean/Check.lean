@@ -58,8 +58,14 @@ unsafe def main (args : List String) : IO UInt32 := do
   let action : MetaM Unit := do
     if mode != "spec" then
       let programType ← inferType (mkConst `Candidate.program)
-      unless ← isDefEq programType (← mkArrow (mkConst `String) (mkConst `String)) do
-        throwError "program must have type String → String"
+      let expectedType ← if mode == "buffers" then
+        mkArrow (mkConst `UInt64) (← mkArrow
+          (mkApp (mkConst `Array [Level.zero]) (mkConst `ByteArray))
+          (mkApp2 (mkConst `Except [Level.zero, Level.zero]) (mkConst `String)
+            (mkApp (mkConst `Array [Level.zero]) (mkConst `ByteArray))))
+        else mkArrow (mkConst `String) (mkConst `String)
+      unless ← isDefEq programType expectedType do
+        throwError "program does not have the manifest's ABI type"
       unless ← isDefEq (mkConst `temperEntry) (mkConst `Candidate.program) do
         throwError "native entry point is not the proved program"
     for obligation in obligations do

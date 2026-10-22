@@ -5,7 +5,10 @@
 //! required before execution by a Rust service.
 
 pub mod artifact;
+mod buffers;
+mod call_scope;
 pub mod cli;
+mod ffi_build;
 pub mod manifest;
 pub mod native;
 mod process;
